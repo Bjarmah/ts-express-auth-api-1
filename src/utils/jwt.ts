@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { User } from '../models/user';
 import { verify } from 'crypto';
 
@@ -9,5 +9,5 @@ export const generateToken = (user: User) => {
 }
 
 export const verifyToken = (token: string) => {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, JWT_SECRET) as JwtPayload;
 }
