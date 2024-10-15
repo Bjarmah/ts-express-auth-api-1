@@ -10,32 +10,24 @@ export enum UserRole {
 @Entity()
 export class User {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id!: string;
 
     @Column()
-    email: string;
+    email!: string;
 
     @Column()
-    password: string;
+    password!: string;
 
     @Column({
         type: 'enum',
         enum: UserRole,
         default: UserRole.USER
     })
-    role: UserRole;
+    role!: UserRole;
 
     @BeforeInsert()
     async hashPassword() {
         this.password = await bcryt.hash(this.password, 10);
     }
-
-    constructor(email: string, password: string, role: UserRole) {
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-
 
 }
