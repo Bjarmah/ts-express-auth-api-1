@@ -64,7 +64,22 @@ export const assignRole = async (req: Request, res: Response) => {
 
 //what other functions do we need to implement for authentication?
 
+export const logout = async (req: Request, res: Response) => { }
 
+export const forgotPassword = async (req: Request, res: Response) => { }
+
+export const resetPassword = async (req: Request, res: Response) => { }
+
+export const changePassword = async (req: Request, res: Response) => { }
+
+export const verifyEmail = async (req: Request, res: Response) => { }
+
+export const resendVerificationEmail = async (req: Request, res: Response) => { }
+
+export const verifyPasswordReset = async (req: Request, res: Response) => { }
+
+
+export const verifyEmailChange = async (req: Request, res: Response) => { }
 
 
 
