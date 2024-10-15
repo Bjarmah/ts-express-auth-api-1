@@ -78,7 +78,6 @@ export const resendVerificationEmail = async (req: Request, res: Response) => { 
 
 export const verifyPasswordReset = async (req: Request, res: Response) => { }
 
-
 export const verifyEmailChange = async (req: Request, res: Response) => { }
 
 
