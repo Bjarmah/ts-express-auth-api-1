@@ -30,6 +30,12 @@ export class User {
         this.password = await bcryt.hash(this.password, 10);
     }
 
+    constructor(email: string, password: string, role: UserRole) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
 
 
 }
