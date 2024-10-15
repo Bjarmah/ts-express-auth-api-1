@@ -18,4 +18,26 @@ export const register = async (req: Request, res: Response) => {
 
 }
 
+export const login = async (req: Request, res: Response) => {
+    const userRepository = getRepository(User);
+
+    try {
+        const user = await userRepository.findOne({ where: req.body.email });
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const valid = await bycrpt.compare(req.body.passorod, user.password);
+
+        if (!valid) {
+            return res.status(401).send("Invalid password");
+        }
+
+        const token = generateToken(user);
+        res.json({ token });
+
+    } catch (error) {
+        return res.status(400).send("Error logging in user");
+    }
 }
