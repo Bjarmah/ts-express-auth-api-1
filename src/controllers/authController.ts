@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
 import { User, UserRole } from "../models/user";
 import bycrpt from "bcrypt";
@@ -19,38 +19,42 @@ export const register = async (req: Request, res: Response) => {
 
 }
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userRepository = getRepository(User);
 
     try {
         const user = await userRepository.findOne({ where: req.body.email });
 
         if (!user) {
-            return res.status(404).send("User not found");
+            res.status(404).send("User not found");
+            return;
         }
 
-        const valid = await bycrpt.compare(req.body.passorod, user.password);
+        const valid = await bycrpt.compare(req.body.password, user.password);
 
         if (!valid) {
-            return res.status(401).send("Invalid password");
+            res.status(401).send("Invalid password");
+            return;
         }
 
         const token = generateToken(user);
         res.json({ token });
 
     } catch (error) {
-        return res.status(400).send("Error logging in user");
+        res.status(400).send("Error logging in user");
+        return
     }
 }
 
-export const assignRole = async (req: Request, res: Response) => {
+export const assignRole = async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
 
     try {
         const user = await userRepository.findOne(req.body.id);
 
         if (!user) {
-            return res.status(404).send("User not found");
+            res.status(404).send("User not found");
+            return;
         }
 
         user.role = req.body.role as UserRole;
@@ -59,7 +63,10 @@ export const assignRole = async (req: Request, res: Response) => {
         res.json(user).send("Role assigned successfully " + user.email + " is now a " + user.role);
 
     }
-    catch (error) { return res.status(400).send("Error assigning role to user") }
+    catch (error) {
+        res.status(400).send("Error assigning role to user")
+        return;
+    }
 }
 
 //what other functions do we need to implement for authentication?
