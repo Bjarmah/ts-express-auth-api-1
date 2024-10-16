@@ -57,19 +57,24 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     const userRepository = getRepository(User);
     const userID = req.params.id;
 
+// }
+
+
+export const updateProfile = async (req: Request, res: Response) => {
     try {
-        const users = await userRepository.findOne({ where: { id: userID } });
-        if (!users) {
-            return res.status(404).send("User not found");
-        }
-        userRepository.merge(users, req.body);
-        await userRepository.save(users);
-        res.json(users);
+        const userRepository = getRepository(User);
+        const user = req.user!;
+        const { email } = req.body;
+
+        // Users can only update their own profile
+        await userRepository.update(user.id, { email });
+        res.json({ message: 'Profile updated successfully' });
     } catch (error) {
-        res.status(400).send("Error updating user");
+        res.status(500).json({ message: 'Error updating profile' });
     }
 
 }
+};
 
 export const getPublicData = async (req: Request, res: Response) => {
     res.json({ Message: "THis is the public data i guess", Timestamp: new Date() });
