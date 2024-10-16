@@ -3,6 +3,7 @@ import { getRepository } from "typeorm";
 import { User } from "../models/user";
 
 
+
 export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
     const userID = req.user?.id;
@@ -18,4 +19,18 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
     }
 
 }
+
+export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+    const userRepository = getRepository(User);
+
+    try {
+        const users = await userRepository.find();
+        res.json(users);
+    } catch (error) {
+        res.status(400).send("Error fetching users");
+    }
+
+}
+
+
 
