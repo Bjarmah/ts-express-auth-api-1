@@ -50,4 +50,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
 }
 
+export const getPublicData = async (req: Request, res: Response) => {
+    res.json({ Message: "THis is the public data i guess" })
+}
 
