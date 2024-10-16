@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
+import { getRepository, Timestamp } from "typeorm";
 import { User } from "../models/user";
 
 
-
+//Users
 export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
     const userID = req.user?.id;
@@ -20,6 +21,7 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
 
 }
 
+//Admin
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
 
@@ -32,6 +34,7 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
 
 }
 
+//Admin
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
     const userID = req.user?.id;
@@ -69,7 +72,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
 }
 
 export const getPublicData = async (req: Request, res: Response) => {
-    res.json({ Message: "THis is the public data i guess" })
+    res.json({ Message: "THis is the public data i guess", Timestamp: new Date() });
 }
 
 
