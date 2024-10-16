@@ -36,11 +36,9 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
 //Admin
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
-    const userID = req.user?.id;
     const userID = req.params;
 
     try {
-        const users = await userRepository.findOne({ where: { id: userID } });
         const users = await userRepository.findOne(userID);
         if (!users) {
             return res.status(404).send("User not found");
