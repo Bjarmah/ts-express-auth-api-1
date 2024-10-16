@@ -26,7 +26,7 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
 
     try {
         const users = await userRepository.find();
-        res.json(users);
+        res.json(users.map(user => ({ id: user.id, email: user.email, role: user.role })));
     } catch (error) {
         res.status(400).send("Error fetching users");
     }
@@ -37,13 +37,15 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
     const userID = req.user?.id;
+    const userID = req.params;
 
     try {
         const users = await userRepository.findOne({ where: { id: userID } });
+        const users = await userRepository.findOne(userID);
         if (!users) {
             return res.status(404).send("User not found");
         }
-        await userRepository.remove(users);
+        await userRepository.delete(users.id);
         res.json("User deleted successfully");
     } catch (error) {
         res.status(400).send("Error deleting user");
@@ -83,8 +85,6 @@ export const updateProfile = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ message: 'Error updating profile' });
     }
-
-}
 };
 
 export const getPublicData = async (req: Request, res: Response) => {
