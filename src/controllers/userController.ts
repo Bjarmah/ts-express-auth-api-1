@@ -50,7 +50,26 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
 }
 
+export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+    const userRepository = getRepository(User);
+    const userID = req.params.id;
+
+    try {
+        const users = await userRepository.findOne({ where: { id: userID } });
+        if (!users) {
+            return res.status(404).send("User not found");
+        }
+        userRepository.merge(users, req.body);
+        await userRepository.save(users);
+        res.json(users);
+    } catch (error) {
+        res.status(400).send("Error updating user");
+    }
+
+}
+
 export const getPublicData = async (req: Request, res: Response) => {
     res.json({ Message: "THis is the public data i guess" })
 }
+
 
