@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
 import { User } from "../models/user";
-
+import AppDataSource from "../config/database";
 // Type declaration for extended Request
 declare global {
     namespace Express {
@@ -17,7 +17,7 @@ export const getProfile = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
-    const userRepository = getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
     const userID = req.user?.id;
 
     if (!userID) {
@@ -49,7 +49,7 @@ export const getUsers = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
-    const userRepository = getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
 
     try {
         const users = await userRepository.find();
@@ -71,7 +71,7 @@ export const deleteUser = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
-    const userRepository = getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
     const userID = req.params.id; // Fixed: access the id parameter correctly
 
     if (!userID) {
@@ -96,7 +96,7 @@ export const updateProfile = async (
     req: Request,
     res: Response
 ): Promise<void> => {
-    const userRepository = getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
     const user = req.user;
     const { email } = req.body;
 
