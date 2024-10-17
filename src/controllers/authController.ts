@@ -1,93 +1,115 @@
-import { Request, Response, NextFunction } from "express";
-import { getRepository } from "typeorm";
+import { Request, Response } from "express";
 import { User, UserRole } from "../models/user";
-import bycrpt from "bcrypt";
+import bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt";
 import AppDataSource from "../config/database";
 
-
 export const register = async (req: Request, res: Response) => {
-    //Note the reques contains the email and password of the user
-    try {
-
-        const userRepository = AppDataSource.getRepository(User); // Get the user repository
-        const newUser = userRepository.create(req.body); // Create a new user and save in the newUser variable
-        await userRepository.save(newUser); // Save the new user to database
-        res.json(userRepository).send("User created successfully: " + newUser);
-    } catch (error) {
-        res.status(400).send(error + "\nUser not created, Error Registering user");
-    }
-
-}
-
-export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userRepository = AppDataSource.getRepository(User);
 
     try {
-        const user = await userRepository.findOne({ where: req.body.email });
+        // Check if user already exists
+        const existingUser = await userRepository.findOne({
+            where: { email: req.body.email }
+        });
 
-        if (!user) {
-            res.status(404).send("User not found");
-            return;
+        if (existingUser) {
+            return res.status(400).json({
+                message: "User with this email already exists"
+            });
         }
 
-        const valid = await bycrpt.compare(req.body.password, user.password);
+        // Create new user
+        const user = userRepository.create({
+            email: req.body.email,
+            password: req.body.password,
+            role: req.body.role || UserRole.USER
+        });
 
-        if (!valid) {
-            res.status(401).send("Invalid password");
-            return;
+        // Save user
+        await userRepository.save(user);
+
+        res.status(201).json({
+            message: "User created successfully",
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        console.error("Registration error:", error);
+        res.status(400).json({
+            message: "Error creating user",
+            error: (error as Error).message
+        });
+    }
+};
+
+export const login = async (req: Request, res: Response) => {
+    const userRepository = AppDataSource.getRepository(User);
+
+    try {
+        const user = await userRepository.findOne({
+            where: { email: req.body.email }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const validPassword = await bcrypt.compare(req.body.password, user.password);
+
+        if (!validPassword) {
+            return res.status(401).json({ message: "Invalid password" });
         }
 
         const token = generateToken(user);
         res.json({ token });
 
     } catch (error) {
-        res.status(400).send("Error logging in user");
-        return
+        console.error("Login error:", error);
+        res.status(400).json({
+            message: "Error logging in",
+            error: (error as Error).message
+        });
     }
-}
+};
 
-export const assignRole = async (req: Request, res: Response, next: NextFunction) => {
+export const assignRole = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
 
     try {
-        const user = await userRepository.findOne(req.body.id);
+        const user = await userRepository.findOne({
+            where: { id: req.body.id }
+        });
 
         if (!user) {
-            res.status(404).send("User not found");
-            return;
+            return res.status(404).json({ message: "User not found" });
         }
 
-        user.role = req.body.role as UserRole;
+        // Validate role
+        if (!Object.values(UserRole).includes(req.body.role)) {
+            return res.status(400).json({ message: "Invalid role" });
+        }
+
+        user.role = req.body.role;
         await userRepository.save(user);
 
-        res.json(user).send("Role assigned successfully " + user.email + " is now a " + user.role);
+        res.json({
+            message: "Role assigned successfully",
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role
+            }
+        });
 
+    } catch (error) {
+        console.error("Role assignment error:", error);
+        res.status(400).json({
+            message: "Error assigning role",
+            error: (error as Error).message
+        });
     }
-    catch (error) {
-        res.status(400).send("Error assigning role to user")
-        return;
-    }
-}
-
-//what other functions do we need to implement for authentication?
-
-export const logout = async (req: Request, res: Response) => { }
-
-export const forgotPassword = async (req: Request, res: Response) => { }
-
-export const resetPassword = async (req: Request, res: Response) => { }
-
-export const changePassword = async (req: Request, res: Response) => { }
-
-export const verifyEmail = async (req: Request, res: Response) => { }
-
-export const resendVerificationEmail = async (req: Request, res: Response) => { }
-
-export const verifyPasswordReset = async (req: Request, res: Response) => { }
-
-export const verifyEmailChange = async (req: Request, res: Response) => { }
-
-
-
-
+};
