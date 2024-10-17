@@ -3,13 +3,14 @@ import { getRepository } from "typeorm";
 import { User, UserRole } from "../models/user";
 import bycrpt from "bcrypt";
 import { generateToken } from "../utils/jwt";
+import AppDataSource from "../config/database";
 
 
 export const register = async (req: Request, res: Response) => {
     //Note the reques contains the email and password of the user
     try {
 
-        const userRepository = getRepository(User); // Get the user repository
+        const userRepository = AppDataSource.getRepository(User); // Get the user repository
         const newUser = userRepository.create(req.body); // Create a new user and save in the newUser variable
         await userRepository.save(newUser); // Save the new user to database
         res.json(userRepository).send("User created successfully: " + newUser);
@@ -20,7 +21,7 @@ export const register = async (req: Request, res: Response) => {
 }
 
 export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const userRepository = getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
 
     try {
         const user = await userRepository.findOne({ where: req.body.email });
@@ -47,7 +48,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 }
 
 export const assignRole = async (req: Request, res: Response, next: NextFunction) => {
-    const userRepository = getRepository(User);
+    const userRepository = AppDataSource.getRepository(User);
 
     try {
         const user = await userRepository.findOne(req.body.id);
