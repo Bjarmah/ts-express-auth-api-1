@@ -64,10 +64,20 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     const userRepository = AppDataSource.getRepository(User);
 
     try {
-        const userIdToDelete = req.body;
+        const { id: userIdToDelete } = req.body;
 
         if (!userIdToDelete) {
             res.status(400).json({ message: "User ID is required" });
+            return;
+        }
+
+        // Validate UUID format
+        const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!uuidV4Regex.test(userIdToDelete)) {
+            res.status(400).json({
+                message: "Invalid UUID format",
+                details: "UUID should be in format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+            });
             return;
         }
 
@@ -94,16 +104,14 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
             message: "User deleted successfully",
             deletedUserId: userIdToDelete
         });
-
     } catch (error) {
         console.error("Error in deleteUser:", error);
         res.status(500).json({
             message: "Error deleting user",
-            error: (error as Error).message
+            error: error instanceof Error ? error.message : 'Unknown error'
         });
     }
 };
-
 export const updateProfile = async (
     req: Request,
     res: Response
