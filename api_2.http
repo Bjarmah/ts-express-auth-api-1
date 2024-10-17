@@ -1,0 +1,51 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### Register Admin User
+# @name registerAdmin
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin"
+}
+
+### Login as Admin
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "admin@example.com",
+    "password": "admin123"
+}
+
+### Save admin token
+@adminToken = {{loginAdmin.response.body.token}}
+
+### Register User to Delete
+# @name registerUserToDelete
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "email": "todelete@example.com",
+    "password": "password123"
+}
+
+### Get Users List (to get ID)
+GET {{baseUrl}}/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+### Delete User (Replace USER_ID with actual ID from users list)
+DELETE {{baseUrl}}/users/delete
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+    "id": "1a3422b2-637c-4e76-8e72-8c3c20c6b"
+}
