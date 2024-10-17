@@ -1,7 +1,7 @@
-import { ConnectionOptions } from "typeorm";
+import { DataSourceOptions, DataSource } from "typeorm";
 import { User } from "../models/user";
 
-const config: ConnectionOptions = {
+const config: DataSourceOptions = {
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT) || 5432,
@@ -14,4 +14,6 @@ const config: ConnectionOptions = {
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 }
 
-export default config;
+const AppDataSource = new DataSource(config);
+
+export default AppDataSource;
