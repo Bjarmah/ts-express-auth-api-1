@@ -1,15 +1,30 @@
-import 'reflect-metadata';
-import dotenv from 'dotenv';
-import express from 'express';
+import 'dotenv/config';
 import app from './app';
-import { createConnection } from 'typeorm';
-
-dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-createConnection().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server is running on http://localhost:${PORT}`);
-    });
-}).catch(error => console.error("Error connecign to the Database: ", error));
+const startServer = async () => {
+    try {
+        app.listen(PORT, () => {
+            console.log(`Server is running on port http://localhost:${PORT}`);
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        });
+    } catch (error) {
+        console.error('Error starting server:', error);
+        process.exit(1);
+    }
+};
+
+startServer();
+
+process.on('unhandledRejection', (err) => {
+    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.error(err);
+    process.exit(1);
+});
+
+process.on('uncaughtException', (err) => {
+    console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+    console.error(err);
+    process.exit(1);
+});
