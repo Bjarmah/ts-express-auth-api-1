@@ -47,5 +47,5 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{adminToken}}
 
 {
-    "id": "1a3422b2-637c-4e76-8e72-8c3c20c6b"
+    "id": "3771a697-9541-4bb0-a0bd-e7c587d5bfff"
 }

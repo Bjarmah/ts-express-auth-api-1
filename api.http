@@ -52,7 +52,7 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{adminToken}}
 
 {
-    "id": "3771a697-9541-4bb0-a0bd-e7c587d5bfff",
+    "id": "70ccc28b-cf08-4b89-a112-6dacdfc3f52c",
     "role": "guest"
 }
 
@@ -64,7 +64,7 @@ Authorization: Bearer {{userToken}}
 ### Get All Users (Admin Only)
 GET {{baseUrl}}/users
 Content-Type: {{contentType}}
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{userToken}}
 
 ### Update Profile
 PATCH {{baseUrl}}/users/profile
