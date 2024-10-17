@@ -12,25 +12,16 @@ declare global {
 }
 
 // Users
-export const getProfile = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> => {
-    const userRepository = AppDataSource.getRepository(User);
-    const userID = req.user?.id;
-
-    if (!userID) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-    }
-
+export const getProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = await userRepository.findOne({ where: { id: userID } });
+        // req.user is set by the authenticateJWT middleware
+        const user = req.user;
+
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(401).json({ message: 'User not found' });
             return;
         }
+
         res.json({
             user: {
                 id: user.id,
@@ -39,10 +30,13 @@ export const getProfile = async (
             }
         });
     } catch (error) {
-        res.status(500).json({ message: "Error fetching user profile" });
+        console.error('Error fetching profile:', error);
+        res.status(500).json({
+            message: 'Error fetching profile',
+            error: (error as Error).message
+        });
     }
 };
-
 // Admin
 export const getUsers = async (
     req: Request,
@@ -66,29 +60,47 @@ export const getUsers = async (
 };
 
 // Admin
-export const deleteUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> => {
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
     const userRepository = AppDataSource.getRepository(User);
-    const userID = req.params.id; // Fixed: access the id parameter correctly
-
-    if (!userID) {
-        res.status(400).json({ message: "User ID is required" });
-        return;
-    }
 
     try {
-        const user = await userRepository.findOne({ where: { id: userID } });
-        if (!user) {
+        const userIdToDelete = req.body;
+
+        if (!userIdToDelete) {
+            res.status(400).json({ message: "User ID is required" });
+            return;
+        }
+
+        // Check if user exists
+        const userToDelete = await userRepository.findOne({
+            where: { id: userIdToDelete }
+        });
+
+        if (!userToDelete) {
             res.status(404).json({ message: "User not found" });
             return;
         }
-        await userRepository.delete(user.id);
-        res.json({ message: "User deleted successfully" });
+
+        // Check if trying to delete self
+        if (req.user && userToDelete.id === req.user.id) {
+            res.status(400).json({ message: "Cannot delete your own account" });
+            return;
+        }
+
+        // Perform the deletion
+        await userRepository.remove(userToDelete);
+
+        res.status(200).json({
+            message: "User deleted successfully",
+            deletedUserId: userIdToDelete
+        });
+
     } catch (error) {
-        res.status(500).json({ message: "Error deleting user" });
+        console.error("Error in deleteUser:", error);
+        res.status(500).json({
+            message: "Error deleting user",
+            error: (error as Error).message
+        });
     }
 };
 
