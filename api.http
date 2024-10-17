@@ -1,0 +1,77 @@
+### Variables
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### Register Regular User
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "email": "user@example.com",
+    "password": "password123",
+    "role": "USER"
+}
+
+### Register Admin User
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "ADMIN"
+}
+
+### Login as Regular User (Save the token from response)
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
+
+### Save regular user token
+@userToken = {{loginUser.response.body.token}}
+
+### Login as Admin (Save the token from response)
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "admin@example.com",
+    "password": "admin123"
+}
+
+### Save admin token
+@adminToken = {{loginAdmin.response.body.token}}
+
+### Get Public Data (No Auth Required)
+GET {{baseUrl}}/public
+Content-Type: {{contentType}}
+
+### Get User Profile (Regular User)
+GET {{baseUrl}}/profile
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
+
+### Update Profile (Regular User)
+PATCH {{baseUrl}}/profile
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
+
+{
+    "email": "updated.user@example.com"
+}
+
+### Get All Users (Admin Only)
+GET {{baseUrl}}/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+### Delete User (Admin Only)
+DELETE {{baseUrl}}/users/some-user-id
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
