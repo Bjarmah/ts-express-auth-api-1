@@ -9,5 +9,6 @@ export const generateToken = (user: User) => {
 }
 
 export const verifyToken = (token: string) => {
+    console.log("Token received for verification:", token);
     return jwt.verify(token, JWT_SECRET) as JwtPayload;
 }

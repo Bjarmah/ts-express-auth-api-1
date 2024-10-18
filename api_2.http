@@ -1,11 +1,43 @@
-### Variables
 @baseUrl = http://localhost:3000
-@contentType = application/json
 
+@adminToken = {{adminLogin.response.body.token}}
+
+### Register a new user
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "email": "bjarmah1@gmail.com",
+    "password": "password123",
+    "role": "user"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "bjarmah1@gmail.com",
+    "password": "password123"
+}
+
+### Verify OTP
+# @name verifyOTP
+POST {{baseUrl}}/auth/verifyOTP
+Content-Type: application/json
+
+{
+    "email": "bjarmah1@gmail.com",
+    "otp": "{{login.response.body.testingOtp}}"
+}
+
+@authToken = {{verifyOTP.response.body.token}}
 ### Register Admin User
 # @name registerAdmin
 POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
     "email": "admin@example.com",
@@ -14,38 +46,46 @@ Content-Type: {{contentType}}
 }
 
 ### Login as Admin
-# @name loginAdmin
+# @name adminLogin
 POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
     "email": "admin@example.com",
     "password": "admin123"
 }
 
-### Save admin token
-@adminToken = {{loginAdmin.response.body.token}}
+### Get Public Data
+GET {{baseUrl}}/users/public
 
-### Register User to Delete
-# @name registerUserToDelete
-POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
+### Get User Profile (Authenticated)
+# Ensure login request is executed before this request
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{authToken}}
+### Update Profile (Authenticated)
+# Ensure login request is executed before this request
+PATCH {{baseUrl}}/users/profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
 
 {
-    "email": "todelete@example.com",
-    "password": "password123"
+    "email": "updated@example.com"
 }
 
-### Get Users List (to get ID)
+### Get All Users (Admin Only)
 GET {{baseUrl}}/users
-Content-Type: {{contentType}}
 Authorization: Bearer {{adminToken}}
 
-### Delete User (Replace USER_ID with actual ID from users list)
-DELETE {{baseUrl}}/users/delete
-Content-Type: {{contentType}}
+### Assign Role (Admin Only)
+POST {{baseUrl}}/auth/assign-role
 Authorization: Bearer {{adminToken}}
+Content-Type: application/json
 
 {
-    "id": "3771a697-9541-4bb0-a0bd-e7c587d5bfff"
+    "id": "USER_ID_HERE",
+    "role": "admin"
 }
+
+### Delete User (Admin Only)
+DELETE {{baseUrl}}/users/delete/USER_ID_HERE
+Authorization: Bearer {{adminToken}}
