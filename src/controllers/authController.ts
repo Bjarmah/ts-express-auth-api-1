@@ -3,6 +3,9 @@ import { User, UserRole } from "../models/user";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt";
 import AppDataSource from "../config/database";
+import logger from "../utils/logger";
+import { OTP } from "../models/otp";
+import { sendOTPEmail } from "../services/OTPService";
 
 export const register = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
@@ -47,34 +50,60 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
     const userRepository = AppDataSource.getRepository(User);
+    const otpRepository = AppDataSource.getRepository(OTP);
 
     try {
+
+        // Find user and verify password
         const user = await userRepository.findOne({
-            where: { email: req.body.email }
+            where: { email }
         });
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
         }
 
-        const validPassword = await bcrypt.compare(req.body.password, user.password);
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        if (!validPassword) {
-            return res.status(401).json({ message: "Invalid password" });
-        }
+        console.log("OTP: ", otp);
+        // Save OTP with 15-minute expiration
+        const otpEntity = otpRepository.create({
+            email: user.email,
+            code: otp,
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
+        });
 
-        const token = generateToken(user);
-        res.json({ token });
+        await otpRepository.save(otpEntity);
+
+
+        // Send OTP via email
+        await sendOTPEmail(user.email, otp);
+
+        // For testing purposes, include OTP in response (remove in production)
+        res.json({
+            success: true,
+            message: 'OTP sent successfully',
+            email: user.email,
+            testingOtp: process.env.NODE_ENV === 'development' ? otp : undefined,
+            expiresIn: '15 minutes'
+        });
 
     } catch (error) {
-        console.error("Login error:", error);
-        res.status(400).json({
-            message: "Error logging in",
-            error: (error as Error).message
+        logger.error('Login error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error during login process',
+            error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
         });
     }
 };
+
 
 export const assignRole = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
@@ -110,6 +139,70 @@ export const assignRole = async (req: Request, res: Response) => {
         res.status(400).json({
             message: "Error assigning role",
             error: (error as Error).message
+        });
+    }
+};
+
+export const verifyOTP = async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
+    const userRepository = AppDataSource.getRepository(User);
+    const otpRepository = AppDataSource.getRepository(OTP);
+
+    try {
+        // Find the most recent unused OTP
+        const otpRecord = await otpRepository.findOne({
+            where: {
+                email,
+                used: false
+            },
+            order: { createdAt: 'DESC' }
+        });
+
+        if (!otpRecord) {
+            return res.status(400).json({
+                success: false,
+                message: 'No valid OTP found'
+            });
+        }
+
+        // Check expiration
+        if (new Date() > otpRecord.expiresAt) {
+            return res.status(400).json({
+                success: false,
+                message: 'OTP has expired',
+                expirationTime: otpRecord.expiresAt
+            });
+        }
+
+        // Verify OTP
+        if (otpRecord.code !== otp) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid OTP'
+            });
+        }
+
+        // Mark OTP as used
+        otpRecord.used = true;
+        await otpRepository.save(otpRecord);
+
+        // Generate JWT token
+        const user = await userRepository.findOne({ where: { email } });
+        const token = generateToken(user!);
+
+        res.json({
+            success: true,
+            message: 'Login successful',
+            token,
+            tokenExpiresIn: '24h'
+        });
+
+    } catch (error) {
+        logger.error('OTP verification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error during OTP verification',
+            error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
         });
     }
 };
