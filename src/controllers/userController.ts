@@ -64,7 +64,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     const userRepository = AppDataSource.getRepository(User);
 
     try {
-        const { id: userIdToDelete } = req.body;
+        const { id: userIdToDelete } = req.params;
 
         if (!userIdToDelete) {
             res.status(400).json({ message: "User ID is required" });
