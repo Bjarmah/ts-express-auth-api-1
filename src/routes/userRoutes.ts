@@ -6,9 +6,10 @@ import { isAdmin } from '../middleware/roleMiddleware';
 const router = express.Router();
 
 router.get('/profile', authenticateJWT, getProfile);
-router.get('/users', authenticateJWT, isAdmin, getUsers);
-router.delete('/users/:id', authenticateJWT, isAdmin, deleteUser);
+router.get('/', authenticateJWT, isAdmin, getUsers);
 router.patch('/profile', authenticateJWT, updateProfile);
 router.get('/public', getPublicData);
+router.delete('/delete/:id', authenticateJWT, isAdmin, deleteUser);
 
 export default router;
+
