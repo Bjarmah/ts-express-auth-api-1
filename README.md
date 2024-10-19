@@ -6,7 +6,7 @@ REST API implementation with JWT authentication, Role-Based Access Control (RBAC
 
 ## Base URL
 ```
-http://localhost:3000/api/v1
+https://intern-api-0e3f4df9db4a.herokuapp.com/
 ```
 
 ## Authentication
