@@ -25,6 +25,13 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Hello, TypeScript with Express!");
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    } else {
+        res.json({
+            message: "Welcome to the API",
+            documentation_url: "https://whispering-tor-63318-814178c6cfe8.herokuapp.com/api-docs",
+        });
+    }
 });
 export default app;
