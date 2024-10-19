@@ -42,3 +42,4 @@ export const sendOTPEmail = async (email: string, otp: string) => {
 
 export const generateOTP = Math.floor(100000 + Math.random() * 900000).toString();
 
+
