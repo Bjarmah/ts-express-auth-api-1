@@ -16,7 +16,7 @@ const config: DataSourceOptions = {
         rejectUnauthorized: true
     },
     entities: [User, OTP],
-    synchronize: true,
+    synchronize: false,
     logging: true
 }
 
