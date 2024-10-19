@@ -5,12 +5,12 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const config: DataSourceOptions = {
-    type: 'postgres',
-    host: 'pg-3d72b01-intern-api.k.aivencloud.com',
-    port: 28452,
-    username: 'avnadmin',
-    password: 'AVNS_aC1EloSEnMhUVylYOQe',
-    database: 'defaultdb',
+    type: process.env.DB_TYPE as 'postgres',
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     ssl: {
         ca: process.env.CA_CERT,
         rejectUnauthorized: true
