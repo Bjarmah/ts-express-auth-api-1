@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer'
 import logger from '../utils/logger';
+import * as dotenv from 'dotenv';
+
+dotenv.config(); // Load env variables first
+
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.mailtrap.io', // Use Mailtrap for testing
@@ -35,3 +39,6 @@ export const sendOTPEmail = async (email: string, otp: string) => {
         throw new Error('Failed to send OTP email');
     }
 };
+
+export const generateOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
