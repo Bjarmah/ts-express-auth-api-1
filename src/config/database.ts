@@ -14,8 +14,8 @@ const config: DataSourceOptions = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     ssl: {
-        ca: process.env.CA_CERT,
-        rejectUnauthorized: true
+        ////ca: process.env.CA_CERT,
+        rejectUnauthorized: false
     },
     entities: [User, OTP],
     synchronize: false,
