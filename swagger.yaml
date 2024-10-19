@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: User Authentication and Authorization API
+  description: |
+    Production API for user authentication with JWT, OTP verification, and role-based access control.
+    
+    Note: All API calls require HTTPS.
+  version: 1.0.0
+  
+servers:
+  - url: https://intern-api-0e3f4df9db4a.herokuapp.com
+    description: Production server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [admin, user, guest]
+          
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Password must be at least 8 characters long
+          
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          
+    OTPVerificationRequest:
+      type: object
+      required:
+        - email
+        - otp
+      properties:
+        email:
+          type: string
+          format: email
+        otp:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit OTP code
+          
+    AssignRoleRequest:
+      type: object
+      required:
+        - id
+        - role
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [admin, user, guest]
+          
+    ProfileUpdateRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+          
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: |
+        Authenticate user and send OTP.
+        Rate limited to 5 attempts per 15 minutes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  email:
+                    type: string
+                  expiresIn:
+                    type: string
+        '401':
+          description: Invalid credentials
+        '429':
+          description: Too many login attempts. Please try again after 15 minutes.
+          
+  /auth/verifyOTP:
+    post:
+      tags:
+        - Authentication
+      summary: Verify OTP and get JWT token
+      description: Verify the 6-digit OTP and receive a JWT token valid for 1 hour
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OTPVerificationRequest'
+      responses:
+        '200':
+          description: OTP verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+                  tokenExpiresIn:
+                    type: string
+        '400':
+          description: Invalid or expired OTP
+          
+  /auth/assign-role:
+    post:
+      tags:
+        - Authorization
+      security:
+        - bearerAuth: []
+      summary: Assign role to user (Admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRoleRequest'
+      responses:
+        '200':
+          description: Role assigned successfully
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: User not found
+          
+  /users/profile:
+    get:
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      summary: Get authenticated user's profile
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+    patch:
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      summary: Update authenticated user's profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+        '401':
+          description: Unauthorized
+          
+  /users:
+    get:
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      summary: Get all users (Admin only)
+      responses:
+        '200':
+          description: List of users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Insufficient permissions
+          
+  /users/delete/{id}:
+    delete:
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      summary: Delete user by ID (Admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User deleted successfully
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: User not found
+          
+  /users/public:
+    get:
+      tags:
+        - Public
+      summary: Get public data (accessible to all)
+      responses:
+        '200':
+          description: Public data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
