@@ -25,6 +25,12 @@ export class User {
     })
     role!: UserRole;
 
+    @Column({ nullable: true })
+    googleId?: string;
+
+    @Column({ default: false })
+    isEmailVerified!: boolean;
+
     // Method to return safe user data (without password)
     toJSON() {
         return {

@@ -6,6 +6,8 @@ import AppDataSource from "../config/database";
 import logger from "../utils/logger";
 import { OTP } from "../models/otp";
 import { sendOTPEmail } from "../services/OTPService";
+import { AuthService } from '../services/authService';
+import { googleClient } from '../config/googleAuth';
 
 export const register = async (req: Request, res: Response) => {
     const userRepository = AppDataSource.getRepository(User);
@@ -206,3 +208,36 @@ export const verifyOTP = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+
+
+export class AuthController {
+    private authService = new AuthService();
+
+    async googleAuthRedirect(req: Request, res: Response) {
+        const url = googleClient.generateAuthUrl({
+            access_type: 'offline',
+            scope: [
+                'https://www.googleapis.com/auth/userinfo.profile',
+                'https://www.googleapis.com/auth/userinfo.email'
+            ]
+        });
+        res.redirect(url);
+    }
+
+    async googleCallback(req: Request, res: Response) {
+        try {
+            const { code } = req.query;
+            if (!code || typeof code !== 'string') {
+                throw new Error('Invalid authorization code');
+            }
+
+            const result = await this.authService.googleLogin(code);
+            res.json(result);
+        } catch (error) {
+            logger.error('Google callback error:', error);
+            res.status(500).json({ error: 'Authentication failed' });
+        }
+    }
+}
