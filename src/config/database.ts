@@ -4,8 +4,10 @@ import { OTP } from "../models/otp";
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+console.log('Database Type:', process.env.DB_TYPE);
+
 const config: DataSourceOptions = {
-    type: process.env.DB_TYPE as 'postgres',
+    type: 'postgres',
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     username: process.env.DB_USERNAME,
@@ -19,6 +21,11 @@ const config: DataSourceOptions = {
     synchronize: false,
     logging: true
 }
+
+console.log('Database Config:', {
+    ...config,
+    password: '****' // Hide password in logs
+});
 
 // Alternative configuration using URL
 // const config: DataSourceOptions = {
