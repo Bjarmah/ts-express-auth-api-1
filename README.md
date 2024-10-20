@@ -1,21 +1,33 @@
 # ts-express-auth-api-1
+
 # Authentication & Authorization API Documentation
 
 ## Overview
+
 REST API implementation with JWT authentication, Role-Based Access Control (RBAC), and Multi-Factor Authentication.
 
 ## Base URL
+
 ```
 https://intern-api-0e3f4df9db4a.herokuapp.com/
 ```
 
+## Documentat URL
+
+```
+https://intern-api-0e3f4df9db4a.herokuapp.com/api-docs
+```
+
 ## Authentication
+
 The API uses JWT (JSON Web Token) for authentication. Include the JWT token in the Authorization header:
+
 ```
 Authorization: Bearer <token>
 ```
 
 ## Rate Limiting
+
 - Maximum 100 requests per 15 minutes per IP
 - Rate limit headers included in response:
   - X-RateLimit-Limit
@@ -23,6 +35,7 @@ Authorization: Bearer <token>
   - X-RateLimit-Reset
 
 ## Roles
+
 - **Admin**: Full access to all endpoints
 - **User**: Access to own profile and public data
 - **Guest**: Access to public data only
@@ -32,9 +45,11 @@ Authorization: Bearer <token>
 ### Authentication
 
 #### POST /auth/register
+
 Register a new user.
 
 **Request Body:**
+
 ```json
 {
   "username": "string",
@@ -44,6 +59,7 @@ Register a new user.
 ```
 
 **Response:** 201
+
 ```json
 {
   "message": "User registered successfully",
@@ -53,9 +69,11 @@ Register a new user.
 ```
 
 #### POST /auth/login
+
 Authenticate user and get JWT token.
 
 **Request Body:**
+
 ```json
 {
   "email": "string",
@@ -64,6 +82,7 @@ Authenticate user and get JWT token.
 ```
 
 **Response:** 200
+
 ```json
 {
   "token": "string",
@@ -72,9 +91,11 @@ Authenticate user and get JWT token.
 ```
 
 #### POST /auth/verify-otp
+
 Verify OTP for two-factor authentication.
 
 **Request Body:**
+
 ```json
 {
   "email": "string",
@@ -83,6 +104,7 @@ Verify OTP for two-factor authentication.
 ```
 
 **Response:** 200
+
 ```json
 {
   "token": "string"
@@ -90,9 +112,11 @@ Verify OTP for two-factor authentication.
 ```
 
 #### POST /auth/assign-role
+
 Assign role to user (Admin only).
 
 **Request Body:**
+
 ```json
 {
   "userId": "string",
@@ -101,6 +125,7 @@ Assign role to user (Admin only).
 ```
 
 **Response:** 200
+
 ```json
 {
   "message": "Role assigned successfully"
@@ -110,9 +135,11 @@ Assign role to user (Admin only).
 ### User Management
 
 #### GET /profile
+
 Get authenticated user's profile.
 
 **Response:** 200
+
 ```json
 {
   "id": "string",
@@ -124,9 +151,11 @@ Get authenticated user's profile.
 ```
 
 #### PUT /profile
+
 Update authenticated user's profile.
 
 **Request Body:**
+
 ```json
 {
   "username": "string",
@@ -135,6 +164,7 @@ Update authenticated user's profile.
 ```
 
 **Response:** 200
+
 ```json
 {
   "message": "Profile updated successfully"
@@ -142,12 +172,15 @@ Update authenticated user's profile.
 ```
 
 #### DELETE /user/:id
+
 Delete user by ID (Admin only).
 
 **Parameters:**
+
 - id: string (path)
 
 **Response:** 200
+
 ```json
 {
   "message": "User deleted successfully"
@@ -155,9 +188,11 @@ Delete user by ID (Admin only).
 ```
 
 #### GET /public-data
+
 Get public data (accessible to all roles).
 
 **Response:** 200
+
 ```json
 {
   "data": "array"
@@ -167,6 +202,7 @@ Get public data (accessible to all roles).
 ### Error Responses
 
 #### 400 Bad Request
+
 ```json
 {
   "error": "Validation error message"
@@ -174,6 +210,7 @@ Get public data (accessible to all roles).
 ```
 
 #### 401 Unauthorized
+
 ```json
 {
   "error": "Unauthorized access"
@@ -181,6 +218,7 @@ Get public data (accessible to all roles).
 ```
 
 #### 403 Forbidden
+
 ```json
 {
   "error": "Insufficient permissions"
@@ -188,6 +226,7 @@ Get public data (accessible to all roles).
 ```
 
 #### 404 Not Found
+
 ```json
 {
   "error": "Resource not found"
@@ -195,6 +234,7 @@ Get public data (accessible to all roles).
 ```
 
 #### 429 Too Many Requests
+
 ```json
 {
   "error": "Rate limit exceeded",
@@ -203,6 +243,7 @@ Get public data (accessible to all roles).
 ```
 
 #### 500 Internal Server Error
+
 ```json
 {
   "error": "Internal server error"
@@ -210,6 +251,7 @@ Get public data (accessible to all roles).
 ```
 
 ## Security
+
 - All endpoints use HTTPS
 - Passwords are hashed using bcrypt
 - JWT tokens expire after 1 hour
@@ -217,6 +259,7 @@ Get public data (accessible to all roles).
 - Two-factor authentication available via OTP
 
 ## Headers
+
 ```
 Content-Type: application/json
 Authorization: Bearer <token>
