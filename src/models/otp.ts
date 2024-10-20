@@ -5,6 +5,7 @@ import {
     CreateDateColumn
 } from 'typeorm';
 
+
 @Entity("otps")
 export class OTP {
     @PrimaryGeneratedColumn()
