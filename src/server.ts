@@ -11,6 +11,7 @@ const startServer = async () => {
         await AppDataSource.initialize();
         console.log('Database connection initialized');
 
+        // Start the Express server 
         app.listen(PORT, () => {
             console.log(`Server is running on port http://localhost:${PORT}`);
             console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
