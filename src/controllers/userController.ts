@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
 import { User } from "../models/user";
 import AppDataSource from "../config/database";
+
 // Type declaration for extended Request
 declare global {
     namespace Express {
@@ -37,6 +38,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
         });
     }
 };
+
 // Admin
 export const getUsers = async (
     req: Request,
@@ -112,6 +114,8 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
         });
     }
 };
+
+// User
 export const updateProfile = async (
     req: Request,
     res: Response
@@ -138,6 +142,7 @@ export const updateProfile = async (
     }
 };
 
+//Guest
 export const getPublicData = async (
     req: Request,
     res: Response
