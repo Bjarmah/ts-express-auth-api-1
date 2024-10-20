@@ -151,7 +151,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
     const otpRepository = AppDataSource.getRepository(OTP);
 
     try {
-        // Find the most recent unused OTP
+        // Find the most recent unused OTP from the database
         const otpRecord = await otpRepository.findOne({
             where: {
                 email,
