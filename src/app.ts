@@ -29,7 +29,7 @@ app.get("/", (req: Request, res: Response) => {
         res.sendFile(path.join(__dirname, '../index.html'));
     } else {
         res.json({
-            message: "Welcome to the API",
+            message: "Welcome to 'MY' API",
             documentation_url: "https://intern-api-0e3f4df9db4a.herokuapp.com/api-docs",
         });
     }
