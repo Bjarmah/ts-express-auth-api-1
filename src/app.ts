@@ -21,9 +21,10 @@ app.use(helmet.xssFilter());
 app.use(express.json());
 
 
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
+app.use('/auth', authRoutes);//Add auth routes
+app.use('/users', userRoutes);//Add user routes
 
+// Root route handler for the homepage
 app.get("/", (req: Request, res: Response) => {
     if (req.accepts('html')) {
         res.sendFile(path.join(__dirname, '../index.html'));
