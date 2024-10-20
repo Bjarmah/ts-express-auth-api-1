@@ -20,6 +20,7 @@ router.post('/verifyOTP', verifyOTP as any);
 // Protected routes
 router.post('/assign-role', authenticateJWT, isAdmin, assignRole as any); // Only admins can assign roles
 
+// Google OAuth
 router.get('/auth/google', authController.googleAuthRedirect);
 router.get('/auth/google/callback', authController.googleCallback);
 
