@@ -211,7 +211,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
 
 
 
-
+//Treat the class as a file on its, own
 export class AuthController {
     private authService = new AuthService();
 
