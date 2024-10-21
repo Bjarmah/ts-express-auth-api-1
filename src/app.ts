@@ -21,8 +21,8 @@ app.use(helmet.xssFilter());
 app.use(express.json());
 
 
-app.use('/auth', authRoutes);//Add auth routes
-app.use('/users', userRoutes);//Add user routes
+app.use('/auth', authRoutes);//Add auth routes to app
+app.use('/users', userRoutes);//Add user routes to app
 
 // Root route handler for the homepage
 app.get("/", (req: Request, res: Response) => {
