@@ -8,7 +8,10 @@ const router = express.Router();
 router.get('/profile', authenticateJWT, getProfile);
 router.get('/', authenticateJWT, isAdmin, getUsers);
 router.patch('/profile', authenticateJWT, updateProfile);
+
 router.get('/public', getPublicData);
+
+//Role Assigning endpoint
 router.delete('/delete/:id', authenticateJWT, isAdmin, deleteUser);
 
 export default router;
