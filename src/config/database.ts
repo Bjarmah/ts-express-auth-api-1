@@ -27,6 +27,7 @@ console.log('Database Config:', {
     password: '****' // Hide password in logs
 });
 
+
 // Alternative configuration using URL//It didnt work for me
 // const config: DataSourceOptions = {
 //     type: 'postgres',
