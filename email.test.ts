@@ -25,8 +25,8 @@ async function verifySmtpConnection() {
         console.log('✅ SMTP configuration is valid');
         return true;
     } catch (error) {
-        console.error('❌ SMTP verification failed:', error);
-        console.log('Current SMTP Configuration:');
+        console.error('❌ SMTP verification failed: ', error);
+        console.log('Current SMTP Configuration: ');
         console.log('Host:', process.env.SMTP_HOST);
         console.log('Port:', process.env.SMTP_PORT);
         console.log('User:', process.env.SMTP_USER ? '✓ Set' : '✗ Not Set');
