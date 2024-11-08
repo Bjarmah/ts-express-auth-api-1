@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { User } from '../models/user';
-import { verify } from 'crypto';
+
 
 const JWT_SECRET = process.env.JWT_SECRET || 'jwt_secret';
 
