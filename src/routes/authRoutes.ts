@@ -1,9 +1,5 @@
 import express from 'express';
-import {
-    register,
-    login,
-    assignRole, verifyOTP, AuthController
-} from '../controllers/authController';
+import { register, login, assignRole, verifyOTP, AuthController } from '../controllers/authController';
 import { authenticateJWT } from '../middleware/authMiddleware';
 import { isAdmin } from '../middleware/roleMiddleware';
 import { loginLimiter } from '../middleware/rate-limit';
