@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
-
+//postgres table for otp
 @Entity("otps")
 export class OTP {
     @PrimaryGeneratedColumn()
