@@ -15,14 +15,14 @@ export const authenticateJWT = async (
         if (!authHeader) {
             res.status(401).json({ message: 'No authorization header' });
             return;
-        }
+        };
 
         const token = authHeader.split(' ')[1];
 
         if (!token) {
             res.status(401).json({ message: 'No token provided' });
             return;
-        }
+        };
 
         const decoded = verifyToken(token) as any;
 
@@ -34,7 +34,7 @@ export const authenticateJWT = async (
         if (!user) {
             res.status(401).json({ message: 'User not found' });
             return;
-        }
+        };
 
         req.user = user;
         next();
